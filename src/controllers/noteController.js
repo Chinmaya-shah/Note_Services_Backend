@@ -32,19 +32,26 @@ const createNote = async (req, res) => {
 // GET /api/notes
 const getMyNotes = async (req, res) => {
     try {
-        const notes = await Note.find({ owner: req.user.id }).sort({
-            createdAt: -1,
-        });
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
 
-        return res.status(200).json({
+        const notes = await Note.find({ owner: req.user.id })
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
+
+        const total = await Note.countDocuments({ owner: req.user.id });
+
+        res.status(200).json({
+            page,
+            limit,
+            total,
             count: notes.length,
             notes,
         });
     } catch (error) {
-        console.error('Get notes error:', error.message);
-        return res.status(500).json({
-            error: 'Internal server error',
-        });
+        res.status(500).json({ error: 'Internal server error' });
     }
 };
 

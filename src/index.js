@@ -5,8 +5,12 @@ const jwt = require('jsonwebtoken');
 const connectDB = require('./config/db');
 const noteRoutes = require('./routes/noteRoutes');
 
+
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+const errorHandler = require('./middleware/errorMiddleware');
+app.use(errorHandler);
 
 // Middleware to parse JSON body
 app.use(express.json());
@@ -35,7 +39,7 @@ const startServer = async () => {
     await connectDB();
 
     app.listen(PORT, () => {
-        console.log(`🚀 Notes service running on port ${PORT}`);
+        console.log(`Notes service running on port ${PORT}`);
     });
 };
 
